@@ -1,0 +1,98 @@
+
+.workspace__UpdateProfile__border {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 40%;
+    height: 80%;
+    /* border: 2px solid gray; */
+    /* box-shadow: 0 5px 1px 0 rgba(0, 0, 0, 0.1), 0 8px 20px 0 rgba(0, 0, 0, 0.19); */
+}
+
+.title__workspace {
+    font-family: Roboto;
+    font-size: 40px;
+    font-weight: 500;
+}
+
+.form__workspace {
+    width: 80%;
+    /* border: 5px solid red; */
+}
+
+.input__container {
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    /* border: 5px solid black; */
+    width: 100%;
+}
+
+.input__name__container,
+.input__email__container,
+.input__phonenumber__container {
+    width: 100%;
+}
+
+.workspace__input__container {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.workspace__input__name,
+.workspace__input__email,
+.workspace__input__password {
+    font-family: Roboto;
+}
+
+.input__name,
+.input__country,
+.input__phonenumber,
+.input__email,
+.input__password,
+.input__privacySetting,
+.input__notificationSetting {
+    font-family: Roboto;
+    width: 100%;
+    margin-top: 4px;
+    margin-bottom: 16px;
+    padding: 8px;
+    border: 1px solid rgb(135, 134, 134);
+    border-radius: 6px;
+}
+
+.input__name:focus,
+.input__country:focus,
+.input__phonenumber:focus,
+.input__email:focus,
+.input__password:focus {
+    border: 2px solid black;
+}
+
+.workspace__input__submit {
+    width: 100%;
+    font-size: 15px;
+    background-color: rgb(36, 120, 230);
+    color: white;
+    padding: 10px 0px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    margin-top: 30px;
+}
+
+.workspace__input__submit:hover {
+    background-color: rgb(42, 69, 160);
+}
+
+input:disabled , 
+select:disabled , 
+textarea:disabled{
+    background-color: rgb(212, 212, 212);
+}

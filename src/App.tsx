@@ -1,25 +1,30 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Login from './page/landing_page/Login';
+import Register from './page/landing_page/Register';
+import { AuthProvider, FirebaseAppProvider, FirestoreProvider, StorageProvider, useFirebaseApp } from 'reactfire';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+import Landing_page from './page/landing_page/LandingPage';
+import ContentPage from './page/content_page/ContentPage';
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <FirestoreProvider sdk={getFirestore(useFirebaseApp())}>
+      <AuthProvider sdk={getAuth(useFirebaseApp())}>
+        <StorageProvider sdk={getStorage(useFirebaseApp())}>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Landing_page />}></Route>
+              <Route path="/landingPage/login" element={<Login />}></Route>
+              <Route path="/landingPage/register" element={<Register />}></Route>
+              <Route path="/ContentPage/*" element={<ContentPage />}></Route>
+            </Routes>
+          </BrowserRouter>
+        </StorageProvider>
+      </AuthProvider>
+    </FirestoreProvider>
+
   );
 }
 
