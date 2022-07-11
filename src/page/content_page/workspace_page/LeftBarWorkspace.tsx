@@ -60,7 +60,7 @@ const LeftBarWorkspace = () => {
     await setDoc(doc(db, `BoardCollection/${boardRef.id}/members`, UserContext.user.userId), {
       username: UserContext.user.username,
       email: UserContext.user.email,
-      isAdmin: true
+      isAdmin: "True"
     })
 
     await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/memberBoardOf`, boardRef.id), {

@@ -59,7 +59,7 @@ const WorksapceMember = () => {
     await setDoc(doc(db, `WorkspaceCollection/${workspaceContext.workspace.workspaceId}/members`, UserContext.user.userId), {
       username: UserContext.user.username,
       email: UserContext.user.email,
-      isAdmin: false
+      isAdmin: "False" 
     })
 
     await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/memberWorkspaceOf`, workspaceContext.workspace.workspaceId), {
@@ -110,7 +110,7 @@ const WorksapceMember = () => {
                             <td>{workspaceMember.email}</td>
                             {
                               workspaceContext.currentUserWorkspaceRole === "Guest" || workspaceContext.currentUserWorkspaceRole === "Member" ?
-                                workspaceMember.isAdmin === "true" ?
+                                workspaceMember.isAdmin === "True" ?
                                   (
                                     <td>Admin</td>
                                   )
@@ -123,7 +123,7 @@ const WorksapceMember = () => {
                                   <>
                                     <select onChange={(e) => { setRole({ userId: workspaceMember.docUserId as string, roleUser: e.target.value as string }); }}>
                                       {
-                                        workspaceMember.isAdmin === "true" ?
+                                        workspaceMember.isAdmin === "True" ?
                                           (
                                             <>
                                               <option selected value="true">Admin</option>
