@@ -76,7 +76,7 @@ const WorkspaceProvider: React.FC<Props> = ({ children }) => {
     }
     
     if(checkUserIsWorkspaceMember === true){
-        if(workspaceDetailData.workspaceMembers[indexCurrentUser].isAdmin === "true"){
+        if(workspaceDetailData.workspaceMembers[indexCurrentUser].isAdmin === "True"){
             userWorkspaceRole = "Admin"
         }else{
             userWorkspaceRole = "Member"

@@ -33,7 +33,7 @@ const WorksapceMember = () => {
   // }
   
   // workspaceContext.workspace.workspaceMembers = workspaceMember as Array<WorkspaceMember>
-
+  console.log(workspaceContext.currentUserWorkspaceRole)
   const changeRoleHandle = async ({ roleUser, userId }: GrantRevokeWorksapce) => {
     console.log(userId)
     console.log(roleUser)
@@ -41,7 +41,6 @@ const WorksapceMember = () => {
     batch.update(refUser, {
       isAdmin: roleUser
     })
-
 
     if(userId === UserContext.user.userId){
       if(roleUser === 'Admin'){
@@ -126,15 +125,15 @@ const WorksapceMember = () => {
                                         workspaceMember.isAdmin === "True" ?
                                           (
                                             <>
-                                              <option selected value="true">Admin</option>
-                                              <option value="false">Member</option>
+                                              <option selected value="True">Admin</option>
+                                              <option value="False">Member</option>
                                             </>
                                           )
                                           :
                                           (
                                             <>
-                                              <option selected value="false">Member</option>
-                                              <option value="true">Admin</option>
+                                              <option selected value="False">Member</option>
+                                              <option value="True">Admin</option>
                                             </>
                                           )
                                       }
