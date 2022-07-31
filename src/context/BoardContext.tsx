@@ -27,6 +27,7 @@ const BoardContext = React.createContext<boardContextProps>({
         boardDescription: '',
         boardMembers: [],
         boardWorkspaceId : '',
+        boardStatus : '',
     },
     currentUserBoardRole : ''
 })
@@ -59,8 +60,7 @@ const BoardProvider : React.FC<Props> = ({ children }) => {
         let checkUserIsBoardMember : boolean = false
         let indexCurrentUser : number = -1
         let userBoardRole = ''
-        // console.log(workspaceId)
-        // console.log(workspaceMember)
+
         for (let index = 0; index < boardDetailData.boardMembers.length; index++) {
             if(boardDetailData.boardMembers[index].docUserId === UserContext.user.userId){
             checkUserIsBoardMember = true;
@@ -69,7 +69,7 @@ const BoardProvider : React.FC<Props> = ({ children }) => {
     }
     
     if(checkUserIsBoardMember == true){
-        if(boardDetailData.boardMembers[indexCurrentUser].isAdmin === true){
+        if(boardDetailData.boardMembers[indexCurrentUser].isAdmin === "True"){
             userBoardRole = "Admin"
         }else{
             userBoardRole = "Member"
@@ -78,8 +78,6 @@ const BoardProvider : React.FC<Props> = ({ children }) => {
         userBoardRole = "Guest"
     }  
     
-    console.log(userBoardRole)
-
     return (
         <BoardContext.Provider value={{ board: boardDetailData , currentUserBoardRole : userBoardRole}} >
             {children}

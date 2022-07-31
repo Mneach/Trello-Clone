@@ -1,9 +1,9 @@
 import { signInWithEmailAndPassword } from 'firebase/auth'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { auth } from '../../firebase/config'
+import { auth } from '../../lib/firebase/config'
 import LandingPageNavbar from './LandingPageNavbar'
-import './styles/Login__css.css'
+import '../../css/landingStyle/Login__css.css'
 
 const Login = () => {
 

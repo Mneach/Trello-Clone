@@ -1,0 +1,5 @@
+input:disabled,
+select:disabled,
+textarea:disabled{
+    background-color: rgb(208, 208, 208);
+}

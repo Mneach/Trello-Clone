@@ -1,33 +1,50 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { AiOutlineHome, AiOutlinePlus, AiOutlineStar } from 'react-icons/ai'
 import { MdOutlineSpaceDashboard } from 'react-icons/md'
-import { RiDashboardLine } from 'react-icons/ri'
+import { ImUserPlus } from 'react-icons/im'
+import { RiDashboardLine, RiUserAddFill } from 'react-icons/ri'
+import { BiWindowClose } from 'react-icons/bi'
 import { useUserContext } from '../../context/UserContext'
-import { useFirestore } from 'reactfire'
-import { auth, db } from '../../firebase/config'
-import { addDoc, collection, doc, query, setDoc, where } from 'firebase/firestore'
-import { Modal, ModalBody, ModalDialog, Button, Form, Card, Navbar } from 'react-bootstrap'
-import './LeftBarContentPage__css.css'
+import { db } from '../../lib/firebase/config'
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore'
+import { Modal, Button, Form, } from 'react-bootstrap'
+import { CreateButton, LinkButton } from '../../component/leftBar/Button'
+import { SuccessUpdatePopUp } from '../../component/modal/Modal'
+import { Navigate, useNavigate } from 'react-router-dom'
+import { replace } from 'lodash'
 
 
 const LeftBarContentPage = () => {
 
   const UserContext = useUserContext()
-  const firestore = useFirestore()
+  const navigate = useNavigate()
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  const [showJoinWorkspace, setShowJoinWorkspace] = useState(false);
+  const handlShowJoinWorkspacePopup = () => {setShowJoinWorkspace(true)};
+  const handlCloseJoinWorkspacePopup = () => {
+    setShowJoinWorkspace(false)
+    setLinkInvitaion("")
+  };
+
+  const [showJoinBoard, setShowJoinBoard] = useState(false);
+  const handlShowJoinBoardPopup = () => setShowJoinBoard(true);
+  const handlCloseJoinBoardPopup = () => {
+    setShowJoinBoard(false)
+    setLinkInvitaion("")
+  };  
+
   const [showSuccessUpdate, setShowSuccessUpdate] = useState(false);
-  const handleCloseSuccess = () => setShowSuccessUpdate(false);
   const handleShowUpdate = () => setShowSuccessUpdate(true);
   //=== GETTER SETTER WORKSPACE ===
 
   const [workspaceTitle, setWorkspaceTitle] = useState('')
   const [workspaceVisibility, setWorkspaceVisibility] = useState('Private')
   const [workspaceDescription, setWorkspaceDescription] = useState('')
+  const [linkInvitaion, setLinkInvitaion] = useState("")
 
   //=== END OF GETTER SETTER WORKSPACE ===
 
@@ -38,13 +55,13 @@ const LeftBarContentPage = () => {
       workspaceTitle: workspaceTitle,
       workspaceVisibility: workspaceVisibility,
       workspaceDescription: workspaceDescription,
-      workspaceBoardId : []
+      workspaceBoardId: []
     })
 
     await setDoc(doc(db, `WorkspaceCollection/${workspaceRef.id}/members`, UserContext.user.userId), {
       username: UserContext.user.username,
       email: UserContext.user.email,
-      isAdmin: true
+      isAdmin: "True"
     })
 
     await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/memberWorkspaceOf`, workspaceRef.id), {
@@ -57,67 +74,50 @@ const LeftBarContentPage = () => {
     setWorkspaceVisibility('')
 
     handleClose()
-    handleShowUpdate()
+    navigate(`../Workspace/${workspaceRef.id}/` , {replace : true})
   }
   //=== End Of Add Workspace ===
+
+  const joinWorkspaceViaLink = () => {
+    if (linkInvitaion.startsWith("LIEfTe221W")) {
+      navigate("../WorkspaceInviteLink/" + linkInvitaion, { replace: true })
+    } else if (linkInvitaion.startsWith("EMEfTe221W")) {
+      navigate("../WorkspaceInviteEmail/" + linkInvitaion, { replace: true })
+    } else {
+      navigate("../WorkspaceInviteError/" + linkInvitaion, { replace: true })
+    }
+    handlCloseJoinWorkspacePopup()
+    setLinkInvitaion("")
+  }
+
+  const joinBoardViaLink = () => {
+    if (linkInvitaion.startsWith("LIEfTe221B")) {
+      navigate("../BoardInviteLink/" + linkInvitaion, { replace: true })
+    } else if (linkInvitaion.startsWith("EMEfTe221B")) {
+      navigate("../BoardInviteEmail/" + linkInvitaion, { replace: true })
+    } else {
+      navigate("../BoardInviteError/" + linkInvitaion, { replace: true })
+    }
+    handlCloseJoinWorkspacePopup()
+    setLinkInvitaion("")
+  }  
+  const handleKeyDown = (e : any) => {
+    if(e.key === 'h'){
+      navigate('../')
+      console.log("test")
+    }
+  }
   return (
-    <div className="homePage__content__left__container">
-      <Link to={'/ContentPage/'} className="homePage__ahref" >
-        <div className="homePage__content__left">
-          <div className="homePage__content__left__icon">
-            <AiOutlineHome />
-          </div>
-          <div className="homePage__content__left__word">
-            Home
-          </div>
-        </div>
-      </Link>
-      <Link to={'/ContentPage/FavoriteBoards'} className="homePage__ahref" >
-        <div className="homePage__content__left">
-          <div className="homePage__content__left__icon">
-            <AiOutlineStar />
-          </div>
-          <div className="homePage__content__left__word">
-            Favorite Board
-          </div>
-        </div>
-      </Link>
-      <div className="homePage__content__left">
-        <div className="homePage__content__left__icon">
-          <AiOutlineStar />
-        </div>
-        <div className="homePage__content__left__word">
-          Favorite Workspace
-        </div>
-      </div>
-      <Link to={'/ContentPage/Workspace'} className="homePage__ahref" >
-        <div className="homePage__content__left">
-          <div className="homePage__content__left__icon">
-            <RiDashboardLine />
-          </div>
-          <div className="homePage__content__left__word">
-            Workspace
-          </div>
-        </div>
-      </Link>
-      <Link to={'/ContentPage/Boards'} className = "homePage__ahref">
-        <div className="homePage__content__left">
-          <div className="homePage__content__left__icon">
-            <MdOutlineSpaceDashboard />
-          </div>
-          <div className="homePage__content__left__word">
-            Board
-          </div>
-      </div>
-      </Link>
-      <div className="homePage__content__left" onClick={handleShow}>
-        <div className="homePage__content__left__icon">
-          <AiOutlinePlus />
-        </div>
-        <div className="homePage__content__left__word">
-          Create Workspace
-        </div>
-      </div>
+    <div>
+      <LinkButton icon={<AiOutlineHome />} linkTo={'/ContentPage/'} linkName={"Home"} ></LinkButton>
+      <LinkButton icon={<AiOutlineStar />} linkTo={'/ContentPage/FavoriteBoards'} linkName={"Favorite Board"} ></LinkButton>
+      <LinkButton icon={<RiDashboardLine />} linkTo={'/ContentPage/Workspace'} linkName={"Workspace"} ></LinkButton>
+      <LinkButton icon={<MdOutlineSpaceDashboard />} linkTo={'/ContentPage/Boards'} linkName={"Board"} ></LinkButton>
+      <LinkButton icon={<BiWindowClose />} linkTo={'/ContentPage/ClosedBoard'} linkName={"Closed Board"} ></LinkButton>
+      <CreateButton icon={<AiOutlinePlus />} name={"Create Worksapce"} setShow={setShow} />
+      <CreateButton icon={<ImUserPlus />} name={"Join Worksapce"} setShow={setShowJoinWorkspace} />
+      <CreateButton icon={<RiUserAddFill />} name={"Join Board"} setShow={setShowJoinBoard} />
+
       <Modal
         show={show}
         onHide={handleClose}
@@ -159,26 +159,57 @@ const LeftBarContentPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* MODAL FOR SUCCESS UPDATE */}
-
       <Modal
-        show={showSuccessUpdate}
-        onHide={handleCloseSuccess}
+        show={showJoinWorkspace}
+        onHide={handlCloseJoinWorkspacePopup}
         backdrop="static"
         keyboard={false}
       >
-        <Modal.Header>
-          <Modal.Title>Create Workspace Success</Modal.Title>
+        <Modal.Header closeButton>
+          <Modal.Title>Join Workspace</Modal.Title>
         </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="formControlsText">
+              <Form.Label>Invite Link</Form.Label>
+              <Form.Control value={linkInvitaion} onChange={(e) => setLinkInvitaion(e.target.value)} type="text" placeholder="Enter Invite Link" />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleCloseSuccess}>OK</Button>
+          <Button variant="secondary" onClick={handlCloseJoinWorkspacePopup}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={joinWorkspaceViaLink}>Continue</Button>
         </Modal.Footer>
       </Modal>
 
-      {/* END MODAL FOR SUCCESS UPDATE */}
+      <Modal
+        show={showJoinBoard}
+        onHide={handlCloseJoinBoardPopup}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Join Board</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="formControlsText">
+              <Form.Label>Invite Link</Form.Label>
+              <Form.Control value={linkInvitaion} onChange={(e) => setLinkInvitaion(e.target.value)} type="text" placeholder="Enter Invite Link" />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handlCloseJoinBoardPopup}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={joinBoardViaLink}>Continue</Button>
+        </Modal.Footer>
+      </Modal>
+      <SuccessUpdatePopUp buttonVariant="primary" showSuccessUpdate={showSuccessUpdate} setShowSuccessUpdate={setShowSuccessUpdate} title={"Create Workspace Success"}></SuccessUpdatePopUp>
     </div>
-
-
   )
 }
 

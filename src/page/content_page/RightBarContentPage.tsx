@@ -1,32 +1,29 @@
-import React from 'react'
 import { useUserContext } from '../../context/UserContext'
-import dummyPhoto from '../../photo/dummy.png';
-import './RightBarContentPage__css.css'
+import dummyPhoto from '../../lib/photo/dummy.png';
+import { RightBarContentContainer, RightBarImageContainer, RightUserDataContainer } from '../../component/rightBar/RightContainer';
+import { ImageUser } from '../../component/general/GeneralContent';
 
 const RightBarContentPage = () => {
 
   const UserContext = useUserContext()
   return (
-    <div>
-          <div className="user__profile">
-            {
-              UserContext.user.imageLink?
-              (
-                <img src={UserContext.user.imageLink} />
-              )
-              :
-              (
-                <img src={dummyPhoto} alt="" />
-              )
-            }
-          </div>
-          <div className="user__username">
-            {UserContext.user.username}
-          </div>
-          <div className="user__email">
-            {UserContext.user.email}
-          </div>
-    </div>
+    <RightBarContentContainer>
+      <RightBarImageContainer>
+        {
+          UserContext.user.imageLink ?
+            (<ImageUser src={UserContext.user.imageLink} size={"70%"} borderRadiusSize={"10%"}></ImageUser>)
+            :
+            (<ImageUser src={dummyPhoto} size={"70%"} borderRadiusSize={"10%"}></ImageUser>)
+        }
+      </RightBarImageContainer>
+      <RightUserDataContainer>
+        <p>{UserContext.user.username}</p>
+      </RightUserDataContainer>
+      <RightUserDataContainer>
+        <p>{UserContext.user.email}</p>
+      </RightUserDataContainer>
+
+    </RightBarContentContainer>
   )
 }
 

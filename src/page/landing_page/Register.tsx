@@ -1,11 +1,11 @@
 import { createUserWithEmailAndPassword} from "firebase/auth";
 import { addDoc, collection, doc, setDoc} from "firebase/firestore";
 import { useEffect, useState} from "react";
-import { auth, db } from "../../firebase/config";
+import { auth, db } from "../../lib/firebase/config";
 import { UserType } from "../../model/model";
 import { useNavigate } from 'react-router-dom'
 import LandingPageNavbar from './LandingPageNavbar'
-import './styles/Register__css.css'
+import '../../css/landingStyle/Register__css.css'
 import { useAuth, useFirestore } from "reactfire";
 
 const Register = () => {

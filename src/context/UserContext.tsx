@@ -3,7 +3,7 @@ import { collection, Firestore, getDocs, query, where, writeBatch } from "fireba
 import React, { useContext, createContext, useState, useEffect, Children } from "react";
 import { useNavigate } from "react-router-dom";
 import { useFirestore, useFirestoreCollectionData } from "reactfire";
-import { auth, db } from "../firebase/config";
+import { auth, db } from "../lib/firebase/config";
 import { enumNotificationFrequency, enumPrivacySetting, UserType } from "../model/model";
 
 const UserContext = React.createContext<userContextProps>({

@@ -1,14 +1,18 @@
-import React, { useState } from 'react'
-import { Button, Modal } from 'react-bootstrap'
+import { useState } from 'react'
 import { useBoardContext } from '../../../context/BoardContext'
-import { enumBoardVisibility } from '../../../model/model'
+import { enumBoardVisibility, enumWorkspaceVisibility } from '../../../model/model'
 import NavbarContentPage from '../NavbarContentPage'
-import LeftBarBoard from './LeftBarBoard'
-import './style/Board__css.css'
-import './style/BoardSetting__css.css'
+import '../../../css/boardStyle/Board__css.css'
 import { useFirestore } from 'reactfire'
 import { doc, writeBatch } from 'firebase/firestore'
 import { useUserContext } from '../../../context/UserContext'
+import { SuccessUpdatePopUp } from '../../../component/modal/Modal'
+import { GeneralContentContainer } from '../../../component/general/GeneralContainer'
+import { LeftBarContainer } from '../../../component/leftBar/LeftContainer'
+import { MidContainer, MidContentContainer, MidContentInputContainer, MidInputContainer } from '../../../component/midContent/MidContainer'
+import { MidContentTitle } from '../../../component/midContent/MidContent'
+import { InputSelectVisibility, InputSubmit, InputText, InputTextArea } from '../../../component/midContent/MidForm'
+import LeftBarBoard from './LeftBarBoard'
 
 const BoardSetting = () => {
 
@@ -16,7 +20,7 @@ const BoardSetting = () => {
   const BoardContext = useBoardContext()
   const [boardTitle, setboardTitle] = useState(BoardContext.board.boardTitle)
   const [boardDescription, setboardDescription] = useState(BoardContext.board.boardDescription)
-  const [boardVisibility, setboardVisibiltiy] = useState(BoardContext.board.boardVisibility)
+  const [boardVisibility, setboardVisibiltiy] = useState<enumWorkspaceVisibility | enumBoardVisibility>(BoardContext.board.boardVisibility)
   const firestore = useFirestore()
   const batch = writeBatch(firestore)
 
@@ -32,9 +36,9 @@ const BoardSetting = () => {
       boardDescription: boardDescription
     })
 
-    const refUser = doc(firestore , `UserCollection/${UserContext.user.userId}/memberBoardOf` , BoardContext.board.boardId as string)
-    batch.update(refUser , {
-      boardTitle : boardTitle
+    const refUser = doc(firestore, `UserCollection/${UserContext.user.userId}/memberBoardOf`, BoardContext.board.boardId as string)
+    batch.update(refUser, {
+      boardTitle: boardTitle
     })
 
     await batch.commit();
@@ -43,124 +47,51 @@ const BoardSetting = () => {
   }
 
   return (
-     <div>
+    <div>
       <NavbarContentPage />
-      <div className='board__content__container'>
-        <LeftBarBoard />
-        <div className="board__content__mid__container">
-          <div className="board__content__mid">
-            <div className="board__title">
-              BOARD SETTING
-            </div>
-            <div className="board__content">
-              <div className="board__UpdateProfile__border">
-                <div className="form__board">
-                  <form action="" />
-                  <div className="board__input__container">
+      <GeneralContentContainer>
+        <LeftBarContainer>
+          <LeftBarBoard />
+        </LeftBarContainer>
+        <MidContainer isDetailPage={false}>
+          <MidContentContainer>
+            <MidContentTitle titleName={" Board Setting "} data={false}></MidContentTitle>
+            <MidContentInputContainer>
+              <MidInputContainer>
+                <label htmlFor="email">Board Title</label>
+                {
+                  BoardContext.currentUserBoardRole === 'Admin' ?
+                    (<InputText type='text' value={boardTitle} setValue={setboardTitle} isDisable={true}></InputText>)
+                    :
+                    (<InputText type='text' value={boardTitle} setValue={setboardTitle} isDisable={true}></InputText>)
+                }
 
-                    <div className="board__input__email">
-                      <label htmlFor="email">board Title</label><br />
-                      {
-                        BoardContext.currentUserBoardRole === 'Admin' ?
-                          (
-                            <input className="input__email" value={boardTitle} onChange={(e) => setboardTitle(e.target.value)} id="email" type="text" placeholder="Your Email *" />
-                          )
-                          :
-                          (
-                            <input className="input__email" disabled value={boardTitle} onChange={(e) => setboardTitle(e.target.value)} id="email" type="text" placeholder="Your Email *" />
-                          )
-                      }
-                    </div>
+                <label htmlFor='privacySetting'>board Visibility</label>
+                {
+                  BoardContext.currentUserBoardRole === 'Admin' ?
+                    (<InputSelectVisibility value={boardVisibility} setValue={setboardVisibiltiy} isDisable={false} enumType={"board"}></InputSelectVisibility>)
+                    :
+                    (<InputSelectVisibility value={boardVisibility} setValue={setboardVisibiltiy} isDisable={true} enumType={"board"}></InputSelectVisibility>)
+                }
 
-                    <div className="board__input__privacySetting">
-                      <label htmlFor='privacySetting'>board Visibility</label> <br />
-                      {
-                        BoardContext.currentUserBoardRole === 'Admin' ?
-                          (
-                            <select className='input__privacySetting' value={boardVisibility} onChange={(e) => { setboardVisibiltiy(e.target.value as enumBoardVisibility) }}>
-                              {
-                                Object.keys(enumBoardVisibility).map((BoardVisibilityData) => {
-                                  if (BoardVisibilityData === boardVisibility) {
-                                    return (
-                                      <option value={BoardVisibilityData} selected>{BoardVisibilityData}</option>
-                                    )
-                                  } else {
-                                    return (
-                                      <option value={BoardVisibilityData}>{BoardVisibilityData}</option>
-                                    )
-                                  }
-                                })
-                              }
-                            </select>
-
-                          )
-                          :
-                          (
-                            <select disabled className='input__privacySetting' value={boardVisibility} onChange={(e) => { setboardVisibiltiy(e.target.value as enumBoardVisibility) }}>
-                              {
-                                Object.keys(enumBoardVisibility).map((BoardVisibilityData) => {
-                                  if (BoardVisibilityData === boardVisibility) {
-                                    return (
-                                      <option value={BoardVisibilityData} selected>{BoardVisibilityData}</option>
-                                    )
-                                  } else {
-                                    return (
-                                      <option value={BoardVisibilityData}>{BoardVisibilityData}</option>
-                                    )
-                                  }
-                                })
-                              }
-                            </select>
-                          )
-                      }
-                    </div>
-                    <label htmlFor="boardDescription">board Description</label>
-                    {
-                      BoardContext.currentUserBoardRole === 'Admin' ?
-                        (
-                          <>
-                            <textarea value={boardDescription} onChange={(e) => setboardDescription(e.target.value as string)}>
-
-                            </textarea>
-
-                            <input className="board__input__submit" value={"SAVE"} onClick={updateBoardHandle} type="submit"></input>
-                          </>
-                        )
-                        :
-                        (
-                          <>
-                            <textarea disabled value={boardDescription} onChange={(e) => setboardDescription(e.target.value as string)}>
-                            </textarea>
-                          </>
-                        )
-                    }
-                  </div>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* MODAL FOR SUCCESS UPDATE */}
-
-      <Modal
-        show={showSuccessUpdate}
-        onHide={handleClose}
-        backdrop="static"
-        keyboard={false}
-      >
-        <Modal.Header>
-          <Modal.Title>Update Success</Modal.Title>
-        </Modal.Header>
-        <Modal.Footer>
-          <Button variant="primary" onClick={handleClose}>OK</Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* END MODAL FOR SUCCESS UPDATE */}
-    </div>
+                <label htmlFor="boardDescription">board Description</label>
+                {
+                  BoardContext.currentUserBoardRole === 'Admin' ?
+                    (
+                      <>
+                        <InputTextArea isDisable={false} value={boardDescription} setValue={setboardDescription}></InputTextArea>
+                        <InputSubmit valueName={"SAVE"} onClickFunction={updateBoardHandle}></InputSubmit>
+                      </>
+                    )
+                    : (<InputTextArea isDisable={true} value={boardDescription} setValue={setboardDescription}></InputTextArea>)
+                }
+              </MidInputContainer>
+            </MidContentInputContainer>
+          </MidContentContainer>
+        </MidContainer>
+      </GeneralContentContainer>
+      <SuccessUpdatePopUp buttonVariant="Primary" title={"Update Success"} showSuccessUpdate={showSuccessUpdate} setShowSuccessUpdate={setShowSuccessUpdate}></SuccessUpdatePopUp>
+    </div >
   )
 }
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import LandingPageNavbar from './LandingPageNavbar';
-import './styles/LandingPageNavbar__css.css';
+import '../../css/landingStyle/LandingPageNavbar__css.css';
 
 const Landing_page = () => {
   return (

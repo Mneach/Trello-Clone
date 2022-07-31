@@ -2,9 +2,9 @@ import { FiSettings, FiActivity } from 'react-icons/fi'
 import { IoNotificationsOutline } from 'react-icons/io5'
 import { GoSignOut } from 'react-icons/go'
 import React, { MouseEventHandler, useState } from 'react'
-import { auth , db } from '../../firebase/config'
+import { auth , db } from '../../lib/firebase/config'
 import { Link, useNavigate } from 'react-router-dom'
-import './NavbarContentPage__css.css'
+import '../../css/navbarStyle/NavbarContentPage__css.css'
 import { AiOutlineUser } from 'react-icons/ai'
 
 

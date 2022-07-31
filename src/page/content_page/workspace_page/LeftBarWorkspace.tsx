@@ -1,19 +1,22 @@
-import React, { useState } from 'react'
-import { AiOutlineHome, AiOutlinePlus, AiOutlineStar } from 'react-icons/ai'
+import { useState } from 'react'
+import { AiOutlinePlus } from 'react-icons/ai'
 import { MdOutlineSpaceDashboard } from 'react-icons/md'
-import { RiDashboardLine } from 'react-icons/ri'
-import { FaRegCalendarAlt, FaUser, FaUsers } from 'react-icons/fa'
-import { Link, useParams } from 'react-router-dom'
-import './style/LeftBarWorkspace__css.css'
-import './style/Workspace__css.css'
+import { FaRegCalendarAlt, FaUsers } from 'react-icons/fa'
+import { useNavigate, useParams } from 'react-router-dom'
+import '../../../css/workspaceStyle/Workspace__css.css'
 import { FiSettings } from 'react-icons/fi'
+import { BiMinusCircle } from 'react-icons/bi'
 import { useWorkspaceContext } from '../../../context/WorkspaceContext'
 import { Button, Form, Modal } from 'react-bootstrap'
-import { BoardType, enumBoardVisibility } from '../../../model/model'
-import { addDoc, collection, doc, setDoc, writeBatch } from 'firebase/firestore'
-import { db } from '../../../firebase/config'
-import { useFirestore } from 'reactfire'
+import { enumBoardVisibility, WorkspaceInviteEmailType, WorkspaceInviteLinkType } from '../../../model/model'
+import { addDoc, collection, deleteDoc, doc, query, setDoc, where, writeBatch } from 'firebase/firestore'
+import { db } from '../../../lib/firebase/config'
+import { useFirestore, useFirestoreCollectionData } from 'reactfire'
 import { useUserContext } from '../../../context/UserContext'
+import { SuccessUpdatePopUp } from '../../../component/modal/Modal'
+import { LeftBarContainer, LeftBarTitleContainer } from '../../../component/leftBar/LeftContainer'
+import { CreateButton, LinkButton } from '../../../component/leftBar/Button'
+import { LeftBarTitle } from '../../../component/leftBar/ContentTitle'
 
 const LeftBarWorkspace = () => {
 
@@ -21,6 +24,7 @@ const LeftBarWorkspace = () => {
   const UserContext = useUserContext()
   const { workspaceId } = useParams()
   const firestore = useFirestore()
+  const navigate = useNavigate()
   const batch = writeBatch(firestore)
 
   const [show, setShow] = useState(false);
@@ -28,6 +32,12 @@ const LeftBarWorkspace = () => {
   const handleShow = () => {
     setShow(true)
     setBoardVisibility("Private")
+  };
+
+  const [deletePopup, setDeletePopup] = useState(false);
+  const handleDeletePopupClose = () => setDeletePopup(false);
+  const handleDeletePopupShow = () => {
+    setDeletePopup(true)
   };
 
   const [showSuccessUpdate, setShowSuccessUpdate] = useState(false);
@@ -46,15 +56,12 @@ const LeftBarWorkspace = () => {
 
   const createBoard = async () => {
 
-    const firstBoardUser = ['']
-    firstBoardUser.push(UserContext.user.userId)
-    console.log(firstBoardUser)
-
     const boardRef = await addDoc(collection(db, 'BoardCollection'), {
       boardTitle: boardTitle,
       boardVisibility: boardVisibility,
       boardDescription: boardDescription,
       boardWorkspaceId: workspaceId,
+      boardStatus: "Open"
     })
 
     await setDoc(doc(db, `BoardCollection/${boardRef.id}/members`, UserContext.user.userId), {
@@ -65,7 +72,9 @@ const LeftBarWorkspace = () => {
 
     await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/memberBoardOf`, boardRef.id), {
       boardId: boardRef.id.trim(),
-      boardTitle: boardTitle
+      boardTitle: boardTitle,
+      boardWorkspaceId: workspaceId,
+      boardStatus: "Open"
     })
 
     const newWorkspaceBoardId = Array.from(workspaceContext.workspace.workspaceBoardId)
@@ -82,75 +91,107 @@ const LeftBarWorkspace = () => {
 
     handleClose()
     handleShowUpdate()
-    
+
   }
 
   // console.log(boardVisibility)
+  const getEmailInviteQuery = collection(useFirestore(), 'WorkspaceInviteEmailCollection');
+  const { status: statusInvite, data: dataInvite } = useFirestoreCollectionData(
+    query(getEmailInviteQuery, where("workspaceId", "==", workspaceContext.workspace.workspaceId)),
+    {
+      idField: 'inviteId'
+    })
+
+  const getLinkInviteQuery = collection(firestore, 'WorkspaceInviteLinkCollection')
+  const { status: statusWorkspaceInvite, data: data } = useFirestoreCollectionData(
+    query(getLinkInviteQuery, where("workspaceId", "==", workspaceContext.workspace.workspaceId)), {
+    idField: 'linkId'
+  })
+
+  if (statusInvite === 'loading' || statusWorkspaceInvite === 'loading') {
+    return (<div>Getting data... </div>)
+  }
+
+
+
+  const invitedData = dataInvite as Array<WorkspaceInviteEmailType>
+  const linkData = data as Array<WorkspaceInviteLinkType>
 
   //=== End Of Add Board ===
 
+  const deleteWorkspace = async () => {
 
+    // delete all from memberWorkspaceOf (User Collection)
+    for (let i = 0; i < workspaceContext.workspace.workspaceMembers.length; i++) {
+      const currentWorkspaceMember = workspaceContext.workspace.workspaceMembers[i]
+      deleteDoc(doc(firestore, `UserCollection/${currentWorkspaceMember.docUserId}/memberWorkspaceOf/`, workspaceContext.workspace.workspaceId));
+      deleteDoc(doc(firestore, `WorkspaceCollection/${workspaceContext.workspace.workspaceId}/members/`, currentWorkspaceMember.docUserId as string))
+
+      for (let i = 0; i < workspaceContext.workspace.workspaceBoardId.length; i++) {
+        const currentBoardId = workspaceContext.workspace.workspaceBoardId[i]
+        const refBoardUser = doc(firestore, `UserCollection/${currentWorkspaceMember.docUserId}/memberBoardOf/${currentBoardId}`)
+
+        console.log(refBoardUser)
+
+        batch.update(refBoardUser, {
+          boardStatus: "Closed",
+          boardWorkspaceId: "",
+        })
+
+      }
+    }
+
+    //Update status Board to closed
+    for (let i = 0; i < workspaceContext.workspace.workspaceBoardId.length; i++) {
+      const currentBoardId = workspaceContext.workspace.workspaceBoardId[i]
+      const refBoard = doc(firestore, `BoardCollection/${currentBoardId}`)
+
+      batch.update(refBoard, {
+        boardStatus: "Closed",
+        boardWorkspaceId: "",
+      })
+
+    }
+    await batch.commit();
+
+
+    // delete invitation email from workspacee
+    for (let i = 0; i < invitedData.length; i++) {
+      const element = invitedData[i];
+      deleteDoc(doc(firestore, `WorkspaceInviteEmailCollection`, element.inviteId))
+    }
+
+    // delete invitation link from workspacee
+    for (let i = 0; i < linkData.length; i++) {
+      const element = linkData[i];
+      deleteDoc(doc(firestore, `WorkspaceInviteLinkCollection`, element.linkId))
+    }
+
+    //delete workspace 
+    deleteDoc(doc(firestore, `WorkspaceCollection`, workspaceContext.workspace.workspaceId));
+
+    navigate("../../", { replace: true })
+  }
   return (
-    <div className="workspace__content__left__container">
-      <div className="workspace__content__left__title__container">
-        <div className="workspace__content__left__title">
-          <p>{workspaceContext.workspace.workspaceTitle}</p>
-        </div>
-      </div>
-      <Link to={`/ContentPage/Workspace/${workspaceId}/Boards`} className = "workspace__ahref">
-        <div className="workspace__content__left">
-          <div className="workspace__content__left__icon">
-            <MdOutlineSpaceDashboard />
-          </div>
-          <div className="workspace__content__left__word">
-            Board
-          </div>
-        </div>
-      </Link>
-      <Link to={`/ContentPage/Workspace/${workspaceId}/Members`} className="workspace__ahref" >
-        <div className="workspace__content__left">
-          <div className="workspace__content__left__icon">
-            <FaUsers />
-          </div>
-          <div className="workspace__content__left__word">
-            Member
-          </div>
-        </div>
-      </Link>
-      <Link to={`/ContentPage/Workspace/${workspaceId}/WorkspaceSetting`} className="workspace__ahref" >
-        <div className="workspace__content__left">
-          <div className="workspace__content__left__icon">
-            <FiSettings />
-          </div>
-          <div className="workspace__content__left__word">
-            Setting Workspace
-          </div>
-        </div>
-      </Link>
-      <div className="workspace__content__left">
-        <div className="workspace__content__left__icon">
-          <FaRegCalendarAlt />
-        </div>
-        <div className="workspace__content__left__word">
-          Calendar View
-        </div>
-      </div>
+    <>
+      <LeftBarTitleContainer>
+        <LeftBarTitle type='workspace' titleName={workspaceContext.workspace.workspaceTitle}></LeftBarTitle>
+      </LeftBarTitleContainer>
+      <LinkButton icon={<MdOutlineSpaceDashboard />} linkTo={`/ContentPage/Workspace/${workspaceId}/Boards`} linkName={"Board"} ></LinkButton>
+      <LinkButton icon={<FaUsers />} linkTo={`/ContentPage/Workspace/${workspaceId}/Members`} linkName={"Member"} ></LinkButton>
+      <LinkButton icon={<FiSettings />} linkTo={`/ContentPage/Workspace/${workspaceId}/WorkspaceSetting`} linkName={"Setting Workspace"} ></LinkButton>
+      <LinkButton icon={<FaRegCalendarAlt />} linkTo={`/ContentPage/Workspace/${workspaceId}/CalenderView`} linkName={"Calendar View"} ></LinkButton>
       {
-        workspaceContext.currentUserWorkspaceRole === 'Admin' || workspaceContext.currentUserWorkspaceRole === 'Member'?
-        (
-        <div className="workspace__content__left" onClick={handleShow}>
-          <div className="workspace__content__left__icon">
-            <AiOutlinePlus />
-          </div>
-          <div className="workspace__content__left__word">
-            Create Board
-          </div>
-        </div>
-        )
-        :
-        (
-          <></>
-        )
+        workspaceContext.currentUserWorkspaceRole === 'Admin' || workspaceContext.currentUserWorkspaceRole === 'Member' ?
+          (<CreateButton icon={<AiOutlinePlus />} name={"Create Board"} setShow={setShow}></CreateButton>)
+          :
+          (null)
+      }
+      {
+        workspaceContext.currentUserWorkspaceRole === 'Admin' ?
+          (<CreateButton icon={<BiMinusCircle />} name={"DeleteWorkspace"} setShow={setDeletePopup}></CreateButton>)
+          :
+          (null)
       }
 
       <Modal
@@ -199,24 +240,29 @@ const LeftBarWorkspace = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* MODAL FOR SUCCESS UPDATE */}
-
       <Modal
-        show={showSuccessUpdate}
-        onHide={handleCloseSuccess}
+        show={deletePopup}
+        onHide={handleDeletePopupClose}
         backdrop="static"
         keyboard={false}
       >
-        <Modal.Header>
-          <Modal.Title>Create Board Success</Modal.Title>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Workspace</Modal.Title>
         </Modal.Header>
+        <Modal.Body>
+          <p>Are u sure want to delete this workspace ? </p>
+        </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={handleCloseSuccess}>OK</Button>
+          <Button variant="secondary" onClick={handleDeletePopupClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={deleteWorkspace}>Delete</Button>
         </Modal.Footer>
       </Modal>
 
-      {/* END MODAL FOR SUCCESS UPDATE */}
-    </div>
+      <SuccessUpdatePopUp buttonVariant="primary" showSuccessUpdate={showSuccessUpdate} setShowSuccessUpdate={setShowSuccessUpdate} title={"Create Board Success"}></SuccessUpdatePopUp>
+
+    </>
   )
 }
 

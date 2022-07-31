@@ -17,8 +17,6 @@ function createWindow() {
         width: 1200, height: 800 , webPreferences : {nodeIntegration : true}, icon : 'src/kanban.ico'});
 
 
-
-
     // and load the index.html of the app.
     mainWindow.loadURL('http://localhost:3000');
 
@@ -58,3 +56,43 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+app.setUserTasks([
+    {
+        program : "http://localhost:3000/ContentPage/FavoriteBoards",
+        arguments : '--new-window',
+        iconPath : process.execPath,
+        iconIndex : 0,
+        title : 'Favorite Boards',
+        description : 'Look at favorite board',
+        workingDirectory: "http://localhost:3000/ContentPage/"
+    },
+    {
+        program : "http://localhost:3000/ContentPage/",
+        arguments : '--new-window',
+        iconPath : process.execPath,
+        iconIndex : 0,
+        title : 'Home',
+        description : 'Look at home',
+        workingDirectory: "http://localhost:3000/ContentPage/"
+    },
+    {
+        program : "http://localhost:3000/ContentPage/Boards",
+        arguments : '--new-window',
+        iconPath : process.execPath,
+        iconIndex : 0,
+        title : 'Board',
+        description : 'Look at board',
+        workingDirectory: "http://localhost:3000/ContentPage/"
+    },
+    {
+        program : process.execPath,
+        arguments : '--new-window',
+        iconPath : process.execPath,
+        iconIndex : 0,
+        title : 'New Window',
+        description : 'Look at board',
+        workingDirectory: "http://localhost:3000/ContentPage/"
+    }
+
+])

@@ -6,7 +6,7 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 import Landing_page from './page/landing_page/LandingPage';
-import ContentPage from './page/content_page/ContentPage';
+import ContentPage from './lib/route/ContentPage';
 function App() {
 
   return (
