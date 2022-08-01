@@ -53,6 +53,9 @@ const BoardContent = () => {
 
     return (
         <div>
+            <script type="text/javascript"
+                src="http://maps.googleapis.com/maps/api/js?libraries=geometry&sensor=false&key=AIzaSyBFdnSoRG8k4SbyrSmQyb8I3mUYdbRO3Bo&callback=initMap">
+            </script>
             <div className='homePage__navbar__container'>
                 <div className="homePage__navbar__left">
                     <Link to={'/ContentPage/'} className="chello_ahref">

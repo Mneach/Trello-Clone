@@ -62,9 +62,6 @@ const CardWatcher = ({ realCardDetail }: { realCardDetail: cardType }) => {
         }
     }
 
-    console.log(enableBeCardWatcher)
-    console.log(watcherData)
-    console.log(UserContext.user.userId)
 
     const addLinkClicked = () => {
         setDisplayCardWatcher("none")
@@ -88,16 +85,12 @@ const CardWatcher = ({ realCardDetail }: { realCardDetail: cardType }) => {
             if (a.docUserId === inputCardWatcher) return a
         })
 
-        console.log(newWatcherData)
-
         const cardWatcher = await addDoc(collection(db, 'CardWatcher'), {
             userId: inputCardWatcher,
             cardId: realCardDetail.cardId,
             cardWatcherName: newWatcherData[0].username,
         })
     }
-
-    console.log(inputCardWatcher)
 
     return (
         Array.isArray(watcherData) && !watcherData.length ?
@@ -155,8 +148,8 @@ const CardWatcher = ({ realCardDetail }: { realCardDetail: cardType }) => {
                                             :
                                             BoardContext.currentUserBoardRole === 'Admin' ?
                                                 (<Button onClick={() => deleteCardWatcher(watcherData.watcherId)} size="sm" variant="danger">Remove</Button>)
-                                                    :
-                                                    (null)
+                                                :
+                                                (null)
                                     }
 
                                 </div>

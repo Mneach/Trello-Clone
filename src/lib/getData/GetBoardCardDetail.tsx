@@ -96,7 +96,8 @@ const GetBoardCardDetail = ({ cardDataPerList }: { cardDataPerList: cardType }) 
                         }{
                             <CardCheckList realCardDetail={realCardDetail}></CardCheckList>
                         }{
-                            // <CardLocation realCardDetail={realCardDetail}></CardLocation>
+                            <CardLocation realCardDetail={realCardDetail}></CardLocation>  
+                        }{
                             <CardWatcher realCardDetail={realCardDetail}></CardWatcher>
                         }{
                             <CardComment realCardDetail={realCardDetail}></CardComment>

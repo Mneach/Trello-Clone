@@ -88,8 +88,8 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
             listId: listId,
             cardDesc: "",
             cardLink: "",
-            cardLatitude  : "",
-            cardLongitude : "",
+            cardLatitude  : -6.200110703081585,
+            cardLongitude : 106.78388834110297,
             boardId : BoardContext.board.boardId,
             workspaceId : BoardContext.board.boardWorkspaceId
         })
