@@ -35,7 +35,7 @@ const UserNotification = () => {
 
   //=== Get Board From Firestore ===
 
-  const getWokrspaceInvitation = collection(firestore, `UserCollection/${UserContext.user.userId}/workspaceNotifications`)
+  const getWokrspaceInvitation = collection(firestore, `WorkspaceNotification`)
   const { status: statusWorkspaceInvitation, data: wokrspaceNotificationData } = useFirestoreCollectionData(
     query(getWokrspaceInvitation), {
     idField: 'workspaceNotificaionId'

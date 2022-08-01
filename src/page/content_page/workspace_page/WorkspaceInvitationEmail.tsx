@@ -80,11 +80,18 @@ const WorkspaceInvitationLinkEmail = () => {
             return userinvited !== user[0]
         })
 
-        await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/workspaceNotifications`, workspaceInviteData.workspaceId), {
-            workspaceId : workspaceInviteData.workspaceId,
-            notificationTitle : "New Workspace Member!",
-            notificationMessage : `${UserContext.user.username} has joined the [ ${workspaceInviteData.workspaceTitle} ] workspace Via Email Invitation`
+        const workspaceRef = await addDoc(collection(db, 'WorkspaceNotifications'), {
+            workspaceId: workspaceInviteData.workspaceId,
+            notificationTitle: "New Workspace Member!",
+            notificationMessage: `${UserContext.user.username} has joined the [ ${workspaceInviteData.workspaceTitle} ] workspace Via Link Invitation`
+
         })
+
+        // await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/workspaceNotifications`, workspaceInviteData.workspaceId), {
+        //     workspaceId : workspaceInviteData.workspaceId,
+        //     notificationTitle : "New Workspace Member!",
+        //     notificationMessage : `${UserContext.user.username} has joined the [ ${workspaceInviteData.workspaceTitle} ] workspace Via Email Invitation`
+        // })
 
         await setDoc(doc(db, `WorkspaceCollection/${workspaceInviteData.workspaceId}/members`, UserContext.user.userId), {
             username: UserContext.user.username,
@@ -99,12 +106,12 @@ const WorkspaceInvitationLinkEmail = () => {
 
         const refUser = doc(firestore, `WorkspaceInviteEmailCollection/${emailInviteData[0].inviteId}`)
         batch.update(refUser, {
-            userEmailInvited : newInvitedUser
+            userEmailInvited: newInvitedUser
         })
-        
+
         await batch.commit();
 
-        navigate("../workspace/" + workspaceInviteData.workspaceId +"/Boards" , { replace: true })
+        navigate("../workspace/" + workspaceInviteData.workspaceId + "/Boards", { replace: true })
     }
     return (
         <div>

@@ -107,8 +107,15 @@ const LeftBarBoard = () => {
                         </div>
                     )
             }
-
-            <CreateButton icon={<AiOutlinePlus />} name="Create List" setShow={setListPopup}></CreateButton>
+            {
+                BoardContext.currentUserBoardRole === 'Admin' || BoardContext.currentUserBoardRole === 'Member'?
+                (
+                    <CreateButton icon={<AiOutlinePlus />} name="Create List" setShow={setListPopup}></CreateButton>
+                ) : (
+                    null
+                )
+            }
+            
 
             <Modal
                 show={listPopup}

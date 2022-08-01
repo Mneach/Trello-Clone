@@ -63,7 +63,7 @@ const GetHomeData = () => {
     const realCardData = cardData.filter((cardData) => {
         for (let i = 0; i < boardData.length; i++) {
             const element = boardData[i];
-            if(element.boardId === cardData.boardId) return cardData
+            if(element.boardId === cardData.boardId && element.boardStatus !== "Public") return cardData
         }
     })
 

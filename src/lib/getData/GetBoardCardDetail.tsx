@@ -14,11 +14,13 @@ import CardCheckList from '../../page/content_page/board_page/CardDetail/CardChe
 import CardLocation from '../../page/content_page/board_page/CardDetail/CardLocation'
 import CardComment from '../../page/content_page/board_page/CardDetail/CardComment'
 import CardWatcher from '../../page/content_page/board_page/CardDetail/CardWatcher'
+import { useBoardContext } from '../../context/BoardContext'
 
 const GetBoardCardDetail = ({ cardDataPerList }: { cardDataPerList: cardType }) => {
 
     const firestore = useFirestore()
     const batch = writeBatch(firestore)
+    const BoardContext = useBoardContext()
     const [cardDetailPopup, setCardDetailPopup] = useState(false)
 
     const getCardCollection = collection(firestore, "CardCollection")
@@ -71,9 +73,21 @@ const GetBoardCardDetail = ({ cardDataPerList }: { cardDataPerList: cardType }) 
 
     return (
         <>
-            <button style={midStyleBoard.cardContainer} onClick={() => detailCard(cardDataPerList.cardId as string)}>
-                <p>{cardDataPerList.cardName}</p>
-            </button>
+            {
+                BoardContext.currentUserBoardRole === 'Admin' || BoardContext.currentUserBoardRole === 'Member' ?
+                    (
+                        <button style={midStyleBoard.cardContainer} onClick={() => detailCard(cardDataPerList.cardId as string)}>
+                            <p>{cardDataPerList.cardName}</p>
+                        </button>
+                    )
+                    :
+                    (
+                        <button style={midStyleBoard.cardContainer}>
+                            <p>{cardDataPerList.cardName}</p>
+                        </button>
+                    )
+            }
+
             <Modal
                 show={cardDetailPopup}
                 onHide={() => setCardDetailPopup(false)}
@@ -96,7 +110,7 @@ const GetBoardCardDetail = ({ cardDataPerList }: { cardDataPerList: cardType }) 
                         }{
                             <CardCheckList realCardDetail={realCardDetail}></CardCheckList>
                         }{
-                            <CardLocation realCardDetail={realCardDetail}></CardLocation>  
+                            <CardLocation realCardDetail={realCardDetail}></CardLocation>
                         }{
                             <CardWatcher realCardDetail={realCardDetail}></CardWatcher>
                         }{

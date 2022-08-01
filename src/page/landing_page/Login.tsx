@@ -4,25 +4,41 @@ import { useNavigate } from 'react-router-dom'
 import { auth } from '../../lib/firebase/config'
 import LandingPageNavbar from './LandingPageNavbar'
 import '../../css/landingStyle/Login__css.css'
+import { Alert } from 'react-bootstrap'
 
 const Login = () => {
 
   const[email , setEmail] = useState('')
   const[password , setPassword] = useState('');
   const navigate = useNavigate()
+  const [show, setShow] = useState(false);
 
   const loginHandle = async () => {
     try {
       await signInWithEmailAndPassword(auth , email , password)
       navigate('/ContentPage/')
     } catch (error) {
-      alert(error)
+      setShow(true)
     }
   }
 
   return (
     <div>
       <LandingPageNavbar />
+      {
+        show === true ?
+          (
+            <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+              <Alert.Heading>You got an error!</Alert.Heading>
+              <p>
+                  Wrong credential , please try again!
+              </p>
+            </Alert>
+          )
+          :
+          (null)
+
+      }
       <div className="login__content__container">
         <div className="login__border">
           <div className="title__login">
@@ -48,6 +64,7 @@ const Login = () => {
 
         </div>
       </div>
+
     </div>
   )
 }

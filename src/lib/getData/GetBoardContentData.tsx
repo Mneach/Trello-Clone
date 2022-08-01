@@ -42,7 +42,7 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
         ), {
         idField: 'listId'
     })
-    
+
 
     if (statusGetCardData === 'loading' || statusGetCardDataPerList === 'loading') {
         return (<div>Get card data...</div>)
@@ -65,12 +65,12 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
 
     const deleteList = async () => {
 
-        
+
         for (let i = 0; i < cardDataPerList.length; i++) {
             const element = cardDataPerList[i];
             //delete card in list
             deleteDoc(doc(firestore, `ListCollection/${listData.listId}/Cards/`, element.cardId));
-            
+
             //delete card 
             deleteDoc(doc(firestore, `CardCollection`, element.cardId));
         }
@@ -79,7 +79,7 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
         deleteDoc(doc(firestore, `BoardCollection/${BoardContext.board.boardId}/Lists/`, listData.listId));
 
         //delete list 
-        deleteDoc(doc(firestore , `ListCollection` , listData.listId))
+        deleteDoc(doc(firestore, `ListCollection`, listData.listId))
     }
 
     const createCard = async (listId: string) => {
@@ -88,10 +88,10 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
             listId: listId,
             cardDesc: "",
             cardLink: "",
-            cardLatitude  : -6.200110703081585,
-            cardLongitude : 106.78388834110297,
-            boardId : BoardContext.board.boardId,
-            workspaceId : BoardContext.board.boardWorkspaceId
+            cardLatitude: -6.200110703081585,
+            cardLongitude: 106.78388834110297,
+            boardId: BoardContext.board.boardId,
+            workspaceId: BoardContext.board.boardWorkspaceId
         })
 
         await setDoc(doc(db, `ListCollection/${listId}/Cards`, cardRef.id as string), {
@@ -100,9 +100,9 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
         })
 
         const cardWatcher = await addDoc(collection(db, 'CardWatcher'), {
-            userId : UserContext.user.userId,
-            cardId : cardRef.id,
-            cardWatcherName : UserContext.user.username
+            userId: UserContext.user.userId,
+            cardId: cardRef.id,
+            cardWatcherName: UserContext.user.username
         })
 
         cancelCardClicked()
@@ -117,11 +117,22 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
             <MidListContainer key={listData.listId}>
                 <MidListTitleContainer>
                     <span>{listData.listName}</span>
-                    <CreateIconButton icon={<AiTwotoneDelete size={25} />} onClickFunction={deleteList} ></CreateIconButton>
+                    {
+                        BoardContext.currentUserBoardRole === 'Admin' || BoardContext.currentUserBoardRole === 'Member' ?
+                            (<CreateIconButton icon={<AiTwotoneDelete size={25} />} onClickFunction={deleteList} ></CreateIconButton>) : (null)
+                    }
                 </MidListTitleContainer>
-                <ToggleButton onClick={() => addCardClicked()} style={{ width: "90%", display: `${displayAddCard}`, justifyContent: "flex-start", alignItems: "center" }} className="mb-2" id="toggle-check" type="checkbox" variant="outline-light" value="1">
-                    <span style={{ display: "flex", alignItems: "center" }}><AiOutlinePlus></AiOutlinePlus> Add Card</span>
-                </ToggleButton>
+                {
+                    BoardContext.currentUserBoardRole === 'Admin' || BoardContext.currentUserBoardRole === 'Member' ?
+                        (
+                            <ToggleButton onClick={() => addCardClicked()} style={{ width: "90%", display: `${displayAddCard}`, justifyContent: "flex-start", alignItems: "center" }} className="mb-2" id="toggle-check" type="checkbox" variant="outline-light" value="1">
+                                <span style={{ display: "flex", alignItems: "center" }}><AiOutlinePlus></AiOutlinePlus> Add Card</span>
+                            </ToggleButton>
+                        )
+                        :
+                        (null)
+                }
+
                 <Form style={{ width: "90%", display: `${displayInputCard}` }}>
                     <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                         <Form.Control type="text" value={cardName} onChange={(e) => setCardName(e.target.value)} placeholder="Enter a name for this card" />
