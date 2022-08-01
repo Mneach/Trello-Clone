@@ -195,7 +195,9 @@ export const midStyleWorkspace = {
 export const midStyleBoard =  {
     contentContainer : {
         width : "97%",
-        height : "auto",
+        // height : "auto",
+        minHeight : "780px",
+        maxHeight : "780px",
         display : "flex",
         justifyContent : "flex-start",
         overflow : "auto",

@@ -12,6 +12,7 @@ import { CreateButton, LinkButton } from '../../component/leftBar/Button'
 import { SuccessUpdatePopUp } from '../../component/modal/Modal'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { replace } from 'lodash'
+import { BsCreditCard2Front } from 'react-icons/bs'
 
 
 const LeftBarContentPage = () => {
@@ -37,6 +38,12 @@ const LeftBarContentPage = () => {
     setLinkInvitaion("")
   };  
 
+  const [showViewCard, setShowViewCard] = useState(false);
+  const handleCloseViewCardPopup = () => {
+    setShowViewCard(false)
+    setLinkInvitaion("")
+  };  
+
   const [showSuccessUpdate, setShowSuccessUpdate] = useState(false);
   const handleShowUpdate = () => setShowSuccessUpdate(true);
   //=== GETTER SETTER WORKSPACE ===
@@ -45,6 +52,8 @@ const LeftBarContentPage = () => {
   const [workspaceVisibility, setWorkspaceVisibility] = useState('Private')
   const [workspaceDescription, setWorkspaceDescription] = useState('')
   const [linkInvitaion, setLinkInvitaion] = useState("")
+
+  const [viewCardLink, setViewCardLink] = useState("")
 
   //=== END OF GETTER SETTER WORKSPACE ===
 
@@ -90,6 +99,14 @@ const LeftBarContentPage = () => {
     setLinkInvitaion("")
   }
 
+  const CardLinkView = () => {
+    if (linkInvitaion.startsWith("CAEfTe221")) {
+      navigate("../BoardViewCardLInk/" + linkInvitaion, { replace: true })
+    }else{
+      navigate("../BoardInviteError/" + linkInvitaion, { replace: true })
+    }
+  }
+
   const joinBoardViaLink = () => {
     if (linkInvitaion.startsWith("LIEfTe221B")) {
       navigate("../BoardInviteLink/" + linkInvitaion, { replace: true })
@@ -101,12 +118,7 @@ const LeftBarContentPage = () => {
     handlCloseJoinWorkspacePopup()
     setLinkInvitaion("")
   }  
-  const handleKeyDown = (e : any) => {
-    if(e.key === 'h'){
-      navigate('../')
-      console.log("test")
-    }
-  }
+  
   return (
     <div>
       <LinkButton icon={<AiOutlineHome />} linkTo={'/ContentPage/'} linkName={"Home"} ></LinkButton>
@@ -117,6 +129,7 @@ const LeftBarContentPage = () => {
       <CreateButton icon={<AiOutlinePlus />} name={"Create Worksapce"} setShow={setShow} />
       <CreateButton icon={<ImUserPlus />} name={"Join Worksapce"} setShow={setShowJoinWorkspace} />
       <CreateButton icon={<RiUserAddFill />} name={"Join Board"} setShow={setShowJoinBoard} />
+      <CreateButton icon={<BsCreditCard2Front />} name={"View Card"} setShow={setShowViewCard} />
 
       <Modal
         show={show}
@@ -209,6 +222,31 @@ const LeftBarContentPage = () => {
         </Modal.Footer>
       </Modal>
       <SuccessUpdatePopUp buttonVariant="primary" showSuccessUpdate={showSuccessUpdate} setShowSuccessUpdate={setShowSuccessUpdate} title={"Create Workspace Success"}></SuccessUpdatePopUp>
+    
+      <Modal
+        show={showViewCard}
+        onHide={handleCloseViewCardPopup}
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>View Card</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group className="mb-3" controlId="formControlsText">
+              <Form.Label>Card Link</Form.Label>
+              <Form.Control value={linkInvitaion} onChange={(e) => setLinkInvitaion(e.target.value)} type="text" placeholder="Enter Card Link" />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseViewCardPopup}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={CardLinkView}>Continue</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   )
 }

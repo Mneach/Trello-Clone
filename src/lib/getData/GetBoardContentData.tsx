@@ -86,6 +86,8 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
             listId: listId,
             cardDesc: "",
             cardLink: "",
+            cardLatitude  : "",
+            cardLongitude : "",
             boardId : BoardContext.board.boardId,
             workspaceId : BoardContext.board.boardWorkspaceId
         })

@@ -14,6 +14,7 @@ import HomeCloseBoardDetail from '../../page/content_page/home_page/HomeCloseBoa
 import BoardInvitationLink from '../../page/content_page/board_page/BoardInvitationLink'
 import BoardInvitationLinkEmail from '../../page/content_page/board_page/BoardInvitationEmail'
 import BoardInvitationError from '../../page/content_page/board_page/BoardInvitationError'
+import BoardViewCardLink from '../../page/content_page/board_page/BoardViewCardLink'
 
 const ContentPage = () => {
   return (
@@ -32,6 +33,7 @@ const ContentPage = () => {
         <Route path='/BoardInviteLink/:linkInvitation' element={<BoardInvitationLink />} />
         <Route path='/BoardInviteEmail/:linkInvitation' element={<BoardInvitationLinkEmail />} />
         <Route path='/BoardInviteError/:linkInvitation'  element={<BoardInvitationError />} />
+        <Route path='/BoardViewCardLInk/:linkInvitation'  element={<BoardViewCardLink />} />
         <Route path='/' element={<Home />} />
       </Routes>
     </UserProvider>

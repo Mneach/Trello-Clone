@@ -369,6 +369,14 @@ const BoardMember = () => {
 
       await batch.commit();
 
+      // delete list yang ada di board
+      
+      // delete list
+
+      // delete card yang ada di list
+
+      // delete card
+
       //delete Board
       deleteDoc(doc(firestore, `BoardCollection`, boardContext.board.boardId));
       navigate("../../", { replace: true })

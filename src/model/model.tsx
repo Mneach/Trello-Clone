@@ -111,6 +111,8 @@ export interface cardType {
     cardName : string,
     cardDesc : string,
     cardLink : string,
+    cardLatitude  : number,
+    cardLongitude : number,
     cardLabel : Array<cardLabelType>
     cardDueDate : Array<cardDueDateType>
     cardLocation : Array<cardLocationType>
@@ -132,12 +134,16 @@ export interface cardLocationType {
 
 export interface cardCommentType {
     userId : string,
-    userName : string,
+    userEmail : string,
     comment : string,
+    commentId : string,
+    cardId : string,
 }
 
 export interface cardChecklistType{
-    cardCheckLIst : string
+    checkListId : string,
+    cardCheckList : string,
+    checkListDone : boolean
 }
 
 export enum enumPrivacySetting {
