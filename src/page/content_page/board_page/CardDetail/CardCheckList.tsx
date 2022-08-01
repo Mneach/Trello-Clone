@@ -15,7 +15,6 @@ const CardCheckList = ({ realCardDetail }: { realCardDetail: cardType }) => {
     const batch = writeBatch(firestore)
 
     const [inputCheckList, setInputCheckList] = useState("")
-    const [checkList, setCheckList] = useState(realCardDetail.cardCheckList)
     const [displayCardLink, setDisplayCardLink] = useState("flex")
     const [displayInputCardLink, setDisplayInputCardLink] = useState("none")
     const [isCopied, setIsCopied] = useState(false)
@@ -75,15 +74,7 @@ const CardCheckList = ({ realCardDetail }: { realCardDetail: cardType }) => {
 
     const progressBarTotal = progressBarValue > 100 ? (100) : (progressBarValue)
     const progressBarLabel = progressBarTotal >= 100 ? ("Completed") : (progressBarTotal + "%")
-    // if(progressBarTotal < 30){
-    //     setProgressBarVariant("warning")
-    // }else if(progressBarTotal >= 30 && progressBarTotal < 60){
-    //     setProgressBarVariant("info")
-    // }else if(progressBarTotal >= 60 && progressBarTotal <= 99){
-    //     setProgressBarVariant("primary")
-    // }else {
-    //     setProgressBarVariant("success")
-    // }
+
 
     const progressBarVariant = progressBarTotal < 30 ?
         ("danger")

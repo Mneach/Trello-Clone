@@ -7,6 +7,7 @@ import { CreateIconButton } from '../../component/leftBar/Button'
 import { MidListContainer, MidListTitleContainer } from '../../component/midContent/MidContainer'
 import { midStyleBoard } from '../../component/midContent/style/midStyle_css'
 import { useBoardContext } from '../../context/BoardContext'
+import { useUserContext } from '../../context/UserContext'
 import { cardType, listType } from '../../model/model'
 import { db } from '../firebase/config'
 import GetBoardCardDetail from './GetBoardCardDetail'
@@ -16,6 +17,7 @@ interface boardContentType {
 }
 
 const GetBoardContentData = ({ listData }: boardContentType) => {
+    const UserContext = useUserContext()
     const BoardContext = useBoardContext()
     const [displayAddCard, setDisplayAddCard] = useState("flex")
     const [displayInputCard, setDisplayInputCard] = useState("none")
@@ -95,6 +97,12 @@ const GetBoardContentData = ({ listData }: boardContentType) => {
         await setDoc(doc(db, `ListCollection/${listId}/Cards`, cardRef.id as string), {
             cardId: cardRef.id,
             cardName: cardName
+        })
+
+        const cardWatcher = await addDoc(collection(db, 'CardWatcher'), {
+            userId : UserContext.user.userId,
+            cardId : cardRef.id,
+            cardWatcherName : UserContext.user.username
         })
 
         cancelCardClicked()

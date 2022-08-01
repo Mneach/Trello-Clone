@@ -257,3 +257,39 @@ export const midStyleBoard =  {
         backgroundColor : "transparent"
     } as React.CSSProperties
 }
+
+export const midStyleNotification = {
+    notificationContentContainer : {
+        width : "100%",
+        backgroundColor : "white",
+        display : "flex",
+        justifyContent : "center",
+        flexDirection : "column",
+        alignItems : "center",
+        height : "70px",
+        borderRadius : "10px",
+        marginTop : "10px",
+    } as React.CSSProperties,
+
+    notificationContentTitle: {
+        width : "100%",
+        display : "flex",
+        justifyContent : "center",
+        alignItems : "center",
+        color : "black",
+        fontSize : "16px",
+        textAlign : "center",
+        fontWeight : "bold",
+    } as React.CSSProperties,
+
+    notificationContent: {
+        width : "100%",
+        display : "flex",
+        justifyContent : "center",
+        alignItems : "center",
+        color : "black",
+        fontSize : "16px",
+        textAlign : "center",
+    } as React.CSSProperties,
+
+}

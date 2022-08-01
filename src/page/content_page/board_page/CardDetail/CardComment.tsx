@@ -7,10 +7,11 @@ import { CreateIconButton } from '../../../../component/leftBar/Button'
 import { midStyleBoard } from '../../../../component/midContent/style/midStyle_css'
 import { useUserContext } from '../../../../context/UserContext'
 import { db } from '../../../../lib/firebase/config'
-import { BoardMember, BoardType, cardChecklistType, cardCommentType, cardType, WorkspaceMember } from '../../../../model/model'
+import { BoardMember, BoardType, cardChecklistType, cardCommentType, cardType, cardWathcerType, reactMentionsType, replyType, UserType, WorkspaceMember } from '../../../../model/model'
 import { MentionsInput, Mention, SuggestionDataItem } from "react-mentions";
 import { useBoardContext } from '../../../../context/BoardContext'
 import { union, uniqBy } from 'lodash'
+import CardReplyComment from './CardReplyComment'
 
 const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
 
@@ -22,6 +23,8 @@ const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
     const [cardComment, setCardComment] = useState(realCardDetail.cardDesc)
     const [displayCardComment, setDisplayCardComment] = useState("flex")
     const [displayInputCardComment, setDisplayInputCardComment] = useState("none")
+
+    const [mentionArr, setMentionArr] = useState<reactMentionsType[]>([{id : "" , display : ""}])
 
 
     const getCardCollection = collection(firestore, "CommentCollection")
@@ -38,23 +41,45 @@ const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
         idField: 'docUserId'
     })
 
-    const getWorkspaceCollection = collection(firestore , `WorkspaceCollection/${boardContext.board.boardWorkspaceId}/members`)
+    const getWorkspaceCollection = collection(firestore, `WorkspaceCollection/${boardContext.board.boardWorkspaceId}/members`)
     const { status: statusGetWorkspaceData, data: dataWorkspace } = useFirestoreCollectionData(
         query(getWorkspaceCollection,
         ), {
         idField: 'docUserId'
     })
 
+    const getCommentReplyQuery = collection(firestore, "ReplyCollection")
+    const { status: statusCommentReplyData, data: dataReply } = useFirestoreCollectionData(
+        query(getCommentReplyQuery,
+        ), {
+        idField: 'replyId'
+    })
 
-    if (statusGetCardData === 'loading' || stateGetaBoardData === 'loading' || statusGetWorkspaceData === 'loading') {
+
+    const getUserCollection = collection(firestore, `UserCollection`)
+    const { status: statusGetUserData, data: dataUser } = useFirestoreCollectionData(
+        query(getUserCollection,
+        ), {
+        idField: 'docUserId'
+    })
+
+    const getCardWatcherCollection = collection(firestore, "CardWatcher")
+    const { status: statusGetCardWatcherData, data: dataWacher } = useFirestoreCollectionData(
+        query(getCardWatcherCollection, where("cardId", "==", realCardDetail.cardId)
+        ), {
+        idField: 'watcherId'
+    })
+
+    if (statusGetCardWatcherData === 'loading' || statusCommentReplyData === 'loading' || statusGetUserData === 'loading' || statusGetCardData === 'loading' || stateGetaBoardData === 'loading' || statusGetWorkspaceData === 'loading') {
         return (<div>get comment data</div>)
     }
 
-    const commentData = (dataCard as Array<cardCommentType>)
-    const boardMemberData = dataBoardMember as Array<BoardMember>
-    const workspaceMemberData = dataWorkspace as Array<WorkspaceMember>
-
-    console.log(workspaceMemberData)
+    let commentData = (dataCard as Array<cardCommentType>)
+    let boardMemberData = dataBoardMember as Array<BoardMember>
+    let workspaceMemberData = dataWorkspace as Array<WorkspaceMember>
+    let userData = dataUser as Array<UserType>
+    let replyData = dataReply as Array<replyType>
+    let watcherData = dataWacher as Array<cardWathcerType>
 
     const filterDataWokrspace = workspaceMemberData.map((workspaceMemberData) => {
         return {
@@ -74,29 +99,45 @@ const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
 
     const boardMemberDataSearch = filterDataAccordingToReactMention as unknown as SuggestionDataItem[]
     const workspaceMemberDataSearch = filterDataWokrspace as unknown as SuggestionDataItem[]
-    let dataMention : SuggestionDataItem[] = []
+    let dataMention: SuggestionDataItem[] = []
 
-    if(boardContext.board.boardVisibility === "Private"){
+    if (boardContext.board.boardVisibility === "Private") {
         dataMention = boardMemberDataSearch
-    }else{
+    } else {
         dataMention = uniqBy(union((boardMemberDataSearch), (workspaceMemberDataSearch)), 'id')
     }
 
-    console.log(dataMention)
-
-    const dataMentionSearch = dataMention.filter((dataMention) => {
-        if(dataMention.id !== userContext.user.userId){
+    
+    let dataMentionSearch = dataMention.filter((dataMention) => {
+        if (dataMention.id !== userContext.user.userId) {
             return dataMention
         }
     })
-
+    
     console.log(dataMentionSearch)
+    let resultSearchMention: SuggestionDataItem[] = []
+    for (let i = 0; i < dataMentionSearch.length; i++) {
+        const datamention = dataMentionSearch[i];
+        for (let i = 0; i < userData.length; i++) {
+            const datauser = userData[i];
+            if (datamention.id === datauser.userId && datauser.privacySetting == "On") {
+                resultSearchMention.push(datamention)
+            }
+        }
+    }
 
     const addDescriptionClicked = () => {
         setDisplayCardComment("none")
         setDisplayInputCardComment("block")
         setCardComment("")
     }
+
+    const cancelDescriptionClicked = () => {
+        setDisplayCardComment("flex")
+        setDisplayInputCardComment("none")
+        setCardComment("")
+    }
+
 
     const createComment = async () => {
 
@@ -107,27 +148,77 @@ const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
             userEmail: userContext.user.email
         })
 
+        for (let index = 0; index < mentionArr.length; index++) {
+            if(index === 0) continue
+            const element = mentionArr[index];
+            if(cardComment.includes(element.display)){
+                await addDoc(collection(db, `CardMentionNotification`), {
+                    cardId: realCardDetail.cardId,
+                    userSend : userContext.user.userId,
+                    userMentionedId: element.id,
+                    userEmail: element.display,
+                    notificationTitle : "You Are Mentioned! ",
+                    notificationMessage : `you were mentioned by ${userContext.user.username}  in the card ${realCardDetail.cardName}`
+                })
+        
+            }
+        }
+
+        for (let i = 0; i < watcherData.length; i++) {
+            const element = watcherData[i];
+            await addDoc(collection(db, `CardWatcherNotification`), {
+                cardId: realCardDetail.cardId,
+                userSend : userContext.user.userId,
+                userMentionedId: element.userId,
+                notificationTitle : "Someone Commented On Your Card ",
+                notificationMessage : `Hello Card Watcher your card was commented by ${userContext.user.username}`
+            })
+        }
+
         await batch.commit()
         setCardComment("")
     }
 
     const deleteComment = async (commentId: string) => {
 
+        const replayDeleteData = replyData.filter((replyData) => {
+            if (replyData.commentId === commentId) {
+                return replyData
+            }
+        })
+
+        for (let index = 0; index < replayDeleteData.length; index++) {
+            const element = replayDeleteData[index];
+            await deleteDoc(doc(db, `ReplyCollection/${element.replyId}`))
+        }
+
         await deleteDoc(doc(db, `CommentCollection/${commentId}`))
     }
 
-    const cancelDescriptionClicked = () => {
-        setDisplayCardComment("flex")
-        setDisplayInputCardComment("none")
-        setCardComment("")
-    }
-    function handleCreateComment(event : any, newValue : any, newPlainTextValue : any, mentions : any) {
+    function handleCreateComment(event: any, newValue: any, newPlainTextValue: any, mentions: Array<reactMentionsType>) {
         // console.log(event)
         // console.log(newValue)
         console.log(newPlainTextValue)
-        console.log(mentions)
+        console.log(mentions.length)
+
+        if (mentions.length !== 0) {
+            mentions.map((metions) => {
+
+                const check = mentionArr?.filter((metionarr) => {
+                    if(metionarr.id === metions.id) return metionarr
+                })
+
+                if(Array.isArray(check) && !check.length){
+                    mentionArr.push(metions)
+                }
+                
+            })
+            setMentionArr(mentionArr)
+        }
         setCardComment(newPlainTextValue)
-    }   
+    }
+
+    console.log(mentionArr)
 
     return (
         <div>
@@ -153,9 +244,6 @@ const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
                     (
                         <Form style={{ width: "100%" }}>
                             <Form.Label htmlFor='disableSelect'>Card Comment</Form.Label>
-                            {
-
-                            }
                             <Form.Group className="mb-3" controlId="exampleForm.ControlInput1">
                                 {
                                     commentData.map((comment) => (
@@ -169,9 +257,9 @@ const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
                                                             :
                                                             (null)
                                                     }
-                                                    <Button onClick={() => deleteComment(comment.commentId)} size="sm" variant="info">Reply</Button>{' '}
                                                 </Form.Group>
                                             </div>
+                                            <CardReplyComment commentData={comment} realCardDetail={realCardDetail} resultSearchMention={resultSearchMention}></CardReplyComment>
                                         </>
                                     ))
                                 }
@@ -188,7 +276,7 @@ const CardComment = ({ realCardDetail }: { realCardDetail: cardType }) => {
                                         value={cardComment}
                                         placeholder="Enter Comment"
                                     >
-                                        <Mention trigger="@" data={dataMentionSearch as SuggestionDataItem[]} />
+                                        <Mention trigger="@" data={resultSearchMention as SuggestionDataItem[]} />
                                     </MentionsInput>
                                     <Form.Group style={{ display: "flex", justifyContent: "flex-end", gap: "20px" }} className="mb-3" controlId="exampleForm.ControlInput1">
                                         <Button onClick={() => cancelDescriptionClicked()} style={{ marginTop: "10px" }} size="sm" variant="secondary">Cancel</Button>{' '}

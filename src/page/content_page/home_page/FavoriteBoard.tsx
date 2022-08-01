@@ -90,9 +90,11 @@ const FavoriteBoard = () => {
             </button>
           </div>
           <div className="user__notification__icon">
+            <Link to={'/ContentPage/UserNotification'} >
             <button className="button__icon">
               <IoNotificationsOutline />
             </button>
+            </Link>
           </div>
           <div className="user__setting__icon">
             <Link to={'/ContentPage/UserProfile'} >

@@ -13,6 +13,7 @@ import CardLink from '../../page/content_page/board_page/CardDetail/CardLink'
 import CardCheckList from '../../page/content_page/board_page/CardDetail/CardCheckList'
 import CardLocation from '../../page/content_page/board_page/CardDetail/CardLocation'
 import CardComment from '../../page/content_page/board_page/CardDetail/CardComment'
+import CardWatcher from '../../page/content_page/board_page/CardDetail/CardWatcher'
 
 const GetBoardCardDetail = ({ cardDataPerList }: { cardDataPerList: cardType }) => {
 
@@ -96,6 +97,7 @@ const GetBoardCardDetail = ({ cardDataPerList }: { cardDataPerList: cardType }) 
                             <CardCheckList realCardDetail={realCardDetail}></CardCheckList>
                         }{
                             // <CardLocation realCardDetail={realCardDetail}></CardLocation>
+                            <CardWatcher realCardDetail={realCardDetail}></CardWatcher>
                         }{
                             <CardComment realCardDetail={realCardDetail}></CardComment>
                         }

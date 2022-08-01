@@ -87,11 +87,11 @@ const WorksapceMember = () => {
       idField: 'inviteId'
     })
 
-    const getLinkInviteQuery = collection(firestore, 'WorkspaceInviteLinkCollection')
-    const { status: statusWorkspaceInvite, data: data } = useFirestoreCollectionData(
-      query(getLinkInviteQuery, where("workspaceId", "==", workspaceContext.workspace.workspaceId)), {
-      idField: 'linkId'
-    })
+  const getLinkInviteQuery = collection(firestore, 'WorkspaceInviteLinkCollection')
+  const { status: statusWorkspaceInvite, data: data } = useFirestoreCollectionData(
+    query(getLinkInviteQuery, where("workspaceId", "==", workspaceContext.workspace.workspaceId)), {
+    idField: 'linkId'
+  })
 
   if (statusUser === 'loading' || statusInvite === 'loading' || statusWorkspaceInvite === 'loading') {
     return (<div>Get Data...</div>)
@@ -269,7 +269,7 @@ const WorksapceMember = () => {
     for (let i = 0; i < workspaceContext.workspace.workspaceMembers.length; i++) {
       const currentWorkspaceMember = workspaceContext.workspace.workspaceMembers[i]
       deleteDoc(doc(firestore, `UserCollection/${currentWorkspaceMember.docUserId}/memberWorkspaceOf/`, workspaceContext.workspace.workspaceId));
-      deleteDoc(doc(firestore, `WorkspaceCollection/${workspaceContext.workspace.workspaceId}/members/` , currentWorkspaceMember.docUserId as string))
+      deleteDoc(doc(firestore, `WorkspaceCollection/${workspaceContext.workspace.workspaceId}/members/`, currentWorkspaceMember.docUserId as string))
 
       for (let i = 0; i < workspaceContext.workspace.workspaceBoardId.length; i++) {
         const currentBoardId = workspaceContext.workspace.workspaceBoardId[i]
@@ -349,7 +349,7 @@ const WorksapceMember = () => {
     }
   }
 
- 
+
 
   return (
     <div>
@@ -413,6 +413,12 @@ const WorksapceMember = () => {
                             </MidWorkspaceContentLeftContainer>
                             <MidWorkspaceContentRightContainer>
                               <MidWorkspaceRoleName isAdmin={workspaceMember.isAdmin}></MidWorkspaceRoleName>
+                              {
+                                workspaceMember.docUserId === UserContext.user.userId ?
+                                  (<Button variant="dark" size='sm' onClick={() => leaveFromWorkspace(workspaceMember.docUserId as string)}>Leave</Button>)
+                                  :
+                                  (null)
+                              }
                             </MidWorkspaceContentRightContainer>
                           </MidWorkspaceContent>
                         )

@@ -1,4 +1,4 @@
-import { collection, doc, Firestore, query, setDoc, Timestamp, where } from 'firebase/firestore'
+import { addDoc, collection, doc, Firestore, query, setDoc, Timestamp, where } from 'firebase/firestore'
 import React, { useState } from 'react'
 import { Button } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -77,7 +77,13 @@ const WorkspaceInvitationLink = () => {
       workspaceTitle: workspaceInviteData.workspaceTitle
     })
 
-    navigate("../workspace/" + workspaceInviteData.workspaceId , { replace: true })
+    await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/workspaceNotifications`, workspaceInviteData.workspaceId), {
+      workspaceId : workspaceInviteData.workspaceId,
+      notificationTitle : "New Workspace Member!",
+      notificationMessage : `${UserContext.user.username} has joined the [ ${workspaceInviteData.workspaceTitle} ] workspace Via Link Invitation`
+  })
+
+    navigate("../workspace/" + workspaceInviteData.workspaceId +"/Boards" , { replace: true })
   }
   return (
     <div>

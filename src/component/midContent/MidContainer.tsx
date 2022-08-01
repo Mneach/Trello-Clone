@@ -1,4 +1,4 @@
-import { midStyle, midStyleBoard, midStyleWorkspace } from "./style/midStyle_css"
+import { midStyle, midStyleBoard, midStyleNotification, midStyleWorkspace } from "./style/midStyle_css"
 
 export const MidContainer : React.FC<{children: React.ReactNode | React.ReactFragment , isDetailPage : boolean}> = ({ children , isDetailPage}) => {    
 
@@ -129,6 +129,30 @@ export const MidListContainer : React.FC<{children: React.ReactNode | React.Reac
 export const MidListTitleContainer : React.FC<{children: React.ReactNode | React.ReactFragment}> = ({ children }) => {  
     return(
         <div style={midStyleBoard.listTitleContainer}>
+            {children}
+        </div>
+    )
+}
+
+export const MidNotificationContentContainer : React.FC<{children: React.ReactNode | React.ReactFragment}> = ({ children }) => {  
+    return(
+        <div style={midStyleNotification.notificationContentContainer}>
+            {children}
+        </div>
+    )
+}
+
+export const MidNotificationContent : React.FC<{children: React.ReactNode | React.ReactFragment}> = ({ children }) => {  
+    return(
+        <div style={midStyleNotification.notificationContent}>
+            {children}
+        </div>
+    )
+}
+
+export const MidNotificationTitle : React.FC<{children: React.ReactNode | React.ReactFragment}> = ({ children }) => {  
+    return(
+        <div style={midStyleNotification.notificationContentTitle}>
             {children}
         </div>
     )

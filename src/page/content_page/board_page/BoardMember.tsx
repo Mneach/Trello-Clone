@@ -445,6 +445,13 @@ const BoardMember = () => {
                             </MidWorkspaceContentLeftContainer>
                             <MidWorkspaceContentRightContainer>
                               <MidWorkspaceRoleName isAdmin={boardMember.isAdmin}></MidWorkspaceRoleName>
+                              {
+                                boardMember.docUserId === UserContext.user.userId ?
+                                  (<Button variant="dark" size='sm' onClick={() => leaveFromBoard(boardMember.docUserId as string)}>Leave</Button>)
+                                  :
+                                  (null)
+
+                              }
                             </MidWorkspaceContentRightContainer>
                           </MidWorkspaceContent>
                         )

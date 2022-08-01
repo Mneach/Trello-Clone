@@ -1,4 +1,4 @@
-import { collection, doc, query, setDoc, Timestamp, where, writeBatch } from 'firebase/firestore'
+import { addDoc, collection, doc, query, setDoc, Timestamp, where, writeBatch } from 'firebase/firestore'
 import React, { useState } from 'react'
 import { Button } from 'react-bootstrap'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -45,7 +45,6 @@ const WorkspaceInvitationLinkEmail = () => {
             idField: 'inviteId'
         })
 
-
     if (statusWorkspaceInvite === 'loading' || statusWorkspace === 'loading' || statusInvite === 'loading') {
         return (<div>GETTING INVITATION DATA</div>)
     }
@@ -81,8 +80,11 @@ const WorkspaceInvitationLinkEmail = () => {
             return userinvited !== user[0]
         })
 
-        console.log(newInvitedUser)
-        console.log(emailInviteData[0].inviteId)
+        await setDoc(doc(db, `UserCollection/${UserContext.user.userId}/workspaceNotifications`, workspaceInviteData.workspaceId), {
+            workspaceId : workspaceInviteData.workspaceId,
+            notificationTitle : "New Workspace Member!",
+            notificationMessage : `${UserContext.user.username} has joined the [ ${workspaceInviteData.workspaceTitle} ] workspace Via Email Invitation`
+        })
 
         await setDoc(doc(db, `WorkspaceCollection/${workspaceInviteData.workspaceId}/members`, UserContext.user.userId), {
             username: UserContext.user.username,
@@ -102,7 +104,7 @@ const WorkspaceInvitationLinkEmail = () => {
         
         await batch.commit();
 
-        navigate("../workspace/" + workspaceInviteData.workspaceId , { replace: true })
+        navigate("../workspace/" + workspaceInviteData.workspaceId +"/Boards" , { replace: true })
     }
     return (
         <div>

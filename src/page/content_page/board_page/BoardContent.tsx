@@ -29,7 +29,7 @@ const BoardContent = () => {
 
     const getListCollection = collection(firestore, "ListCollection")
     const { status: statusGetDataList, data: dataList } = useFirestoreCollectionData(
-        query(getListCollection, where("boardId" , "==" , BoardContext.board.boardId)
+        query(getListCollection, where("boardId", "==", BoardContext.board.boardId)
         ), {
         idField: 'listId'
     })
@@ -69,9 +69,11 @@ const BoardContent = () => {
                         </button>
                     </div>
                     <div className="user__notification__icon">
-                        <button className="button__icon">
-                            <IoNotificationsOutline />
-                        </button>
+                        <Link to={'/ContentPage/UserNotification'} >
+                            <button className="button__icon">
+                                <IoNotificationsOutline />
+                            </button>
+                        </Link>
                     </div>
                     <div className="user__setting__icon">
                         <Link to={'/ContentPage/UserProfile'} >

@@ -140,10 +140,58 @@ export interface cardCommentType {
     cardId : string,
 }
 
+export interface replyType {
+    userId : string,
+    userEmail : string,
+    reply : string,
+    commentId : string,
+    replyId : string,
+    cardId : string,
+}
+
 export interface cardChecklistType{
     checkListId : string,
     cardCheckList : string,
     checkListDone : boolean
+}
+
+export interface workspaceNotificaionType{
+    workspaceNotificaionId : string,
+    workspaceId : string,
+    notificationTitle : string,
+    notificationMessage : string
+
+}
+
+export interface mentionNotificationType { 
+    userSend : string,
+    mentionNotificationId : string,
+    cardId: string,
+    userMentionedId: string,
+    userEmail: string,
+    notificationTitle : string,
+    notificationMessage : string,
+
+}
+
+export interface watcherNotifcationType { 
+    cardId: string,
+    userSend :string,
+    userMentionedId:string,
+    notificationTitle : string,
+    notificationMessage : string
+}
+
+export interface cardWathcerType {
+    watcherId : string,
+    userId : string,
+    cardId : string,
+    cardWatcherName : string,
+}
+
+export interface reactMentionsType { 
+    id : string,
+    display : string,
 }
 
 export enum enumPrivacySetting {

@@ -15,12 +15,14 @@ import BoardInvitationLink from '../../page/content_page/board_page/BoardInvitat
 import BoardInvitationLinkEmail from '../../page/content_page/board_page/BoardInvitationEmail'
 import BoardInvitationError from '../../page/content_page/board_page/BoardInvitationError'
 import BoardViewCardLink from '../../page/content_page/board_page/BoardViewCardLink'
+import UserNotification from '../../page/content_page/user_page/UserNotification'
 
 const ContentPage = () => {
   return (
     <UserProvider>
       <Routes>
         <Route path='/UserProfile' element={<UserPage />} />
+        <Route path='/UserNotification' element={<UserNotification />} />
         <Route path='/Workspace' element={<WorkspacePage />} />
         <Route path='/Boards' element = {<HomeBoard />} ></Route>
         <Route path='/ClosedBoard' element = {<HomeCloseBoard />} ></Route>
